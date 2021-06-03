@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="nl">
     <head>
         <meta charset="utf-8">
@@ -7,10 +6,14 @@
         <title>Sogyo Adventure</title>
         <meta name="description" content="The ticket shop for Sogyo employees">
 
+        <link rel="shortcut icon" type="image/jpg" href="img/logo_sogyo_rgb_199x200-1.jpg"/>
         <link rel="stylesheet" href="style/main.css">
     </head>
 
     <body>
+
+        <div id="testingdivs">
+        </div>
 
         <header id="logo-header">
             <img src="img/logo_sogyo_rgb_199x200-1.jpg">
@@ -18,6 +21,7 @@
         <header id="mainheader">
             Sogyo Adventure
         </header>
+        <header id="sticky-header">
         <nav>
             <a id="home" href="index.html">
                 Home
@@ -39,9 +43,10 @@
                 Admin
             </a>
         </nav>
+        </header>
 
         <main>
-
+            <div id="center-articles">
             <article>
                 <div class="parkname">De Efteling</div>
                 <div class="parkdescription">
@@ -59,7 +64,11 @@
                     <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
                     <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
                     <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
-                    <button class="orderbutton">Add to shopping basket</button>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
                 </div>
             </article>
 
@@ -80,7 +89,11 @@
                     <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
                     <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
                     <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
-                    <button class="orderbutton">Add to shopping basket</button>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
                 </div>
             </article>
 
@@ -101,7 +114,11 @@
                     <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
                     <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
                     <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
-                    <button class="orderbutton">Add to shopping basket</button>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
                 </div>
             </article>
 
@@ -122,7 +139,11 @@
                     <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
                     <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
                     <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
-                    <button class="orderbutton">Add to shopping basket</button>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
                 </div>
             </article>
 
@@ -143,7 +164,11 @@
                     <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
                     <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
                     <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
-                    <button class="orderbutton">Add to shopping basket</button>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
                 </div>
             </article>
 
@@ -164,7 +189,11 @@
                     <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
                     <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
                     <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
-                    <button class="orderbutton">Add to shopping basket</button>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
                 </div>
             </article>
 
@@ -185,10 +214,15 @@
                     <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
                     <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
                     <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
-                    <button class="orderbutton">Add to shopping basket</button>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
                 </div>
             </article>
 
+            </div>
         </main>
 
         <script src="src/index.js"></script>

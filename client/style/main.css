@@ -15,6 +15,39 @@ body {
     color: white;
 }
 
+#sticky-header {
+    display: block;
+    z-index: +1;
+}
+
+#center-articles {
+    position: relative;
+}
+
+/* The sticky class is added to the header with JS when it reaches its scroll position */
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%
+}
+
+/* Add some top padding to the page content to prevent sudden quick movement (as the header gets a new position at the top of the page (position:fixed and top:0) */
+.sticky + .content {
+  padding-top: 102px;
+}
+
+a:link, a:visited {
+    color: white;
+}
+
+a:hover {
+    color: cyan;
+}
+
+a:link:active, a:visited:active {
+  color: green;
+}
+
 #logo-header {
     display: flex;
     justify-content: flex-start;
@@ -33,7 +66,9 @@ nav
 {
     height: 2rem;
     line-height: 2rem;
-    background-color: var(--accent-color);
+    background-color: darkgrey;
+    text-align: center;
+
 }
 
 /* Describes the styling of all elements with class="parkname", note the . in front of parkname */
@@ -50,6 +85,9 @@ article {
     border: 1px solid var(--primary-color);
     color: var(--light-text-color);
     margin: 5px;
+    display: block;
+    top: 50%;
+    left: 50%;
 }
 
 .order {
@@ -58,9 +96,44 @@ article {
 
 .badge {
     background-color: red;
-    display: none;
+    display: inline-block;
     color: white;
     font-weight: bold;
     width: 25px;
     border-radius: 25px;
+}
+
+
+.orderbutton {
+  background: hsl(170deg 0% 64%);
+  border-radius: 12px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline-offset: 4px;
+  margin: 20px;
+}
+.front {
+  display: block;
+  padding: 12px 42px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-4px);
+  transition:
+      transform 600ms
+      cubic-bezier(.3, .7, .4, 1);
+}
+
+.orderbutton:hover .front {
+    transform: translateY(-6px);
+    transition:
+        transform
+        250ms
+        cubic-bezier(.3, .7, .4, 1.5);
+}
+
+.orderbutton:active .front {
+  transform: translateY(-2px);
 }
