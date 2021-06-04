@@ -105,6 +105,8 @@ const attractions = [
     },
 ]
 
+var ordersOnServer = [];
+
 /**
  * A route is like a method call. It has a name, some parameters and some return value.
  *
@@ -126,6 +128,23 @@ app.get("/api/attractions", function (request, response) {
 
 app.post("/api/placeorder", function (request, response) {
     console.log("Api call received for /placeorder");
+    // console.log("hello");
+
+    var orders = request.body;
+
+    for (let i = 0; i < orders.length; i++) {
+        for (let j = 0; j < attractions.length; j++) {
+            if (orders[i].name === attractions[j].name) {
+                attractions[j].available = attractions[j].available - orders[i].numberOfAdults - orders[i].numberOfKids;
+            }
+        }
+    }
+
+    ordersOnServer = ordersOnServer.concat(orders);
+
+
+    console.log("orders serverside: ");
+    console.log(ordersOnServer);
 
     /**
      * Send the status code 200 back to the clients browser.

@@ -41,18 +41,52 @@
         </nav>
 
         <main>
-            <button id="finalizepaymentbutton">Pay now</button>
+            <button id="finalizepaymentbutton" onclick="requestPlaceOrder()" class="orderbutton">
+                <span class="front">
+                    Pay now
+                </span>
+            </button>
         </main>
 
         <template id="ticket">
             <article>
-                <div>Parkname</div>
-                <div>Adults: </div>
-                <div>Kids:</div>
-                <button>Cancel order</button>
+                <div class="parkname"></div>
+                <div class="numberofadults"></div>
+                <div class="numberofkids"></div>
+                <div class="price"></div>
+                <button class="orderbutton cancel">
+                    <span class="front cancel">
+                        Cancel order
+                    </span>
+                </button>
             </article>
         </template>
 
     </body>
-    <script src="src/shoppingbasket.js"></script>
+    <script type="module" src="src/shoppingbasket.js"></script>
+
+    <script>
+        async function requestPlaceOrder() {
+            var main = document.querySelector("main");
+            var orders = localStorage.getItem("shoppingBasketArray");
+            console.log(orders);
+
+            const response = await fetch("api/placeorder",
+                {
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                      'Content-Type': 'application/json'
+                      // 'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    body: orders // body data type must match "Content-Type" header
+              }
+            );
+        }
+    </script>
+
 </html>

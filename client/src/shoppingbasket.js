@@ -1,70 +1,62 @@
-document.querySelector(".badge").innerText = localStorage.length;
+import { Order } from "./templateImplementations.js"
+import { displayNumberOfItemsInShoppingBasketWithBadge, findParentWithTag, childKillerUsingTags } from "./utils.js";
+
 
 function getOrderArray() {
-    var orders = new Array;
-    for (let i = 0; i < localStorage.length; i++) {
-        var order = localStorage.getItem(i+1);
-        order = JSON.parse(order);
-        orders.push(order);
-    }
-    // console.log(orders);
+    var orders = JSON.parse(localStorage.getItem("shoppingBasketArray"));
     return orders;
 }
 
-class Order {
-    constructor(orderJSON) {
-        for (const [key, value] of Object.entries(orderJSON)) {
-            this[key] = value;
-        }
-
-    }
-
-    addToMain() {
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
-        var main = document.querySelector("main");
-        var template = document.querySelector("#ticket");
-
-        var clone = template.content.cloneNode(true);
-        // console.log(clone);
-        var lines = clone.querySelectorAll("div");
-
-        for (var i = 0; i < lines.length; i++) {
-            var text = lines[i].textContent;
-
-            if (text === "Parkname") {
-                console.log(this.name);
-                lines[i].textContent = this.name;
-            }
-
-            if (text.toLowerCase().includes("adults")) {
-                lines[i].textContent = text + " " + this.adults;
-            }
-
-            if (text.toLowerCase().includes("kids")) {
-                lines[i].textContent = text + " " + this.children;
-            }
-        }
-
-        main.appendChild(clone);
-    }
-}
-
-
 function displayOrders() {
-    var orders = getOrderArray();
-    for (let i = 0; i < orders.length; i++) {
-        orderObj = new Order(orders[i]);
-        orderObj.addToMain();
-    }
+    displayNumberOfItemsInShoppingBasketWithBadge();
+    const orderFunctionality = {
+        cancel: cancelOrder,
+    };
 
+    var orders = getOrderArray();
+    if (orders === null) return;
+
+    var main = document.querySelector("main");
+
+    for (let i = 0; i < orders.length; i++) {
+        var orderObj = new Order(orders[i], document.querySelector("#ticket"));
+        orderObj.addToNode(main, orderFunctionality);
+    }
 }
 
-displayOrders();
+function cancelOrder(event) {
+    //console.log(event.target);
+    const article = findParentWithTag.bind(event.target)("article");
+
+    var previous = article.previousSibling;
+    var i = 0;
+    while (previous) {
+        if (previous.tagName === "ARTICLE") {
+            i = i+1;
+        }
+        previous = previous.previousSibling;
+    }
+
+    var orders = getOrderArray();
+    orders.splice(i, 1);
+    localStorage.setItem("shoppingBasketArray", JSON.stringify(orders));
+
+    var main = document.querySelector("main");
+    childKillerUsingTags(main)(main.firstChild)("article");
+    displayOrders();
+}
+
+
+
 
 function finalizePayment(event) {
     console.log("finalizing payments");
     localStorage.clear();
+
     window.location.replace("orderplaced.html");
 }
 
+
 document.querySelector("#finalizepaymentbutton").addEventListener("click", finalizePayment);
+
+displayOrders();
