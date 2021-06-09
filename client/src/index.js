@@ -3,9 +3,12 @@ import { displayNumberOfItemsInShoppingBasketWithBadge, dutchCurrencyFormat, dut
 import { fetchAttractions } from "./functions.js"
 
 
+// ik struggle een beetje met de database connecten met de api...
+//
+// loop ineens tegen de volgende error aan:
 
 function displayArticles(articles) {
-
+    console.log("displaying attraction articles");
     const parkArticleFunctionality = {
         orderButtonClick: orderButtonClicked,
         displayTotal: displayTotal,
@@ -20,7 +23,8 @@ function displayArticles(articles) {
 }
 
 function disableButton(name, button) {
-    return function inputEventReceiver(event) {
+    return function receiver(payload) {
+        console.log('checking if button should be disabled');
         const inputs = button.parentNode.querySelectorAll("input");
         var inputTickets = 0;
         for (let i = 0; i < inputs.length; i++) {
@@ -30,42 +34,57 @@ function disableButton(name, button) {
         }
 
         const shoppingBasketArray = JSON.parse(localStorage.getItem("shoppingBasketArray"));
+        // console.log(shoppingBasketArray);
         var shoppingBasketTickets = 0;
 
         if (shoppingBasketArray) {
             for (let i = 0; i < shoppingBasketArray.length; i++) {
                 if (shoppingBasketArray[i].name === name) {
-                    shoppingBasketTickets = inputTickets + shoppingBasketArray[i].numberOfKids + shoppingBasketArray[i].numberOfAdults;
+                    shoppingBasketTickets = shoppingBasketTickets + shoppingBasketArray[i].numberOfKids + shoppingBasketArray[i].numberOfAdults;
                 }
             }
         }
         const totalTickets = inputTickets + shoppingBasketTickets;
-        fetchAttractions()
-            .then(attractions => {
 
-                var attraction;
-                for (let i = 0; i < attractions.length; i++) {
-                    if (attractions[i].name === name) {
-                        attraction = attractions[i];
+        function disablerHelper(payload) {
+            var attraction;
+            if (Array.isArray(payload)) {
+                for (let i = 0; i < payload.length; i++) {
+                    if (payload[i].name === name) {
+                        attraction = payload[i];
                     }
                 }
+            } else attraction = payload;
 
-                var front = button.querySelector(".front");
-                if (attraction.available < totalTickets || attraction.available === 0 || attraction.available === shoppingBasketTickets) {
-                    front.classList.add("disabled");
-                    button.removeEventListener("click", orderButtonClicked);
-                } else {
-                    front.classList.remove("disabled");
-                    button.addEventListener("click", orderButtonClicked);
-                }
+            var front = button.querySelector(".front");
+            if (attraction.available < totalTickets || attraction.available === 0 || attraction.available === shoppingBasketTickets) {
+                console.log("---> disabling " + attraction.name + " button since the available tickets are " + attraction.available + " and tickets among current order is " + totalTickets);
+                front.classList.add("disabled");
+                button.removeEventListener("click", orderButtonClicked);
+            } else {
+                console.log("---> enabling " + attraction.name + " button since the available tickets are " + attraction.available + " and tickets among current order is " + totalTickets);
+                front.classList.remove("disabled");
+                button.addEventListener("click", orderButtonClicked);
+            }
 
-            })
-            .catch(error => {console.error(error)});
+        }
+
+        // console.log(payload)
+        if (payload && payload.name) {
+            if (payload.name) {
+                // console.log("prevented unnecesary fetch")
+                disablerHelper(payload);
+            }
+        } else {
+            // console.log("unnecesary fetch")
+            fetchAttractions()
+                .then(disablerHelper)
+                .catch(error => {console.error(error)});
+        }
     }
 }
 
 function orderButtonClicked(event) {
-
     console.log("button click");
     var button;
 
@@ -84,6 +103,7 @@ function orderButtonClicked(event) {
         numberOfAdults: Number(order.querySelector(".numberofadults").value),
     }
 
+    console.log("---> found this info on the client side:")
     console.log(orderClientSideInfo);
 
     if ((orderClientSideInfo.numberOfKids > 0 && orderClientSideInfo.numberOfAdults >= 0) || (orderClientSideInfo.numberOfAdults > 0 && orderClientSideInfo.numberOfKids >= 0)) {
@@ -91,7 +111,7 @@ function orderButtonClicked(event) {
             .then(checkTicketAvailability(button, orderClientSideInfo))
             .then(saveOrderInShoppingBasket(orderClientSideInfo))
             .then(disableButton(orderClientSideInfo.name, button))
-            .catch((error) => {console.log(error.message)})
+            .catch((error) => {console.error(error)})
     }
 }
 
@@ -122,12 +142,13 @@ export function checkTicketAvailability(button, orderClientSideInfo) {
 }
 
 function saveOrderInShoppingBasket(orderClientSideInfo) {
-    console.log("saving in shopping basket");
+    console.log("---> ---> saving info in shopping basket");
 
     return function serverAttractionsAccepter(serverAttractionsArray) {
         // const orderClientSideInfo = this;
 
         var price;
+        var attraction;
         for (let i = 0; i < serverAttractionsArray.length; i++) {
             if (serverAttractionsArray[i].name === orderClientSideInfo.name) {
                  price = calulateTotal(
@@ -135,12 +156,13 @@ function saveOrderInShoppingBasket(orderClientSideInfo) {
                     orderClientSideInfo.numberOfAdults,
                     serverAttractionsArray[i]
                  );
+                attraction = serverAttractionsArray[i];
             }
         }
 
-        console.log("totalprice: " + price.total);
-        console.log("discount: " + price.discount);
         orderClientSideInfo.price = price;
+        console.log("---> ---> price is saved in the shopping basket order");
+        console.log(orderClientSideInfo);
 
         var shoppingBasketArray;
 
@@ -149,18 +171,20 @@ function saveOrderInShoppingBasket(orderClientSideInfo) {
             shoppingBasketArray.push(orderClientSideInfo);
         } else {
             shoppingBasketArray = JSON.parse(localStorage.getItem("shoppingBasketArray"));
-            console.log("before adding to array: " + shoppingBasketArray);
             shoppingBasketArray.push(orderClientSideInfo);
-            console.log("after adding to array: " + shoppingBasketArray);
         }
 
         localStorage.setItem("shoppingBasketArray", JSON.stringify(shoppingBasketArray));
+        console.log("---> ---> order is saved in array in localstorage");
+        console.log(localStorage);
         displayNumberOfItemsInShoppingBasketWithBadge();
+        return attraction;
     }
 }
 
 function calulateTotal(numberOfKids, numberOfAdults, serverSideAttraction) {
-    console.log("Calculating total !");
+    console.log("---> calculating total of order in shoppingbasket!");
+    console.log("---> ---> fetched this attraction to calculate actual prices!");
     console.log(serverSideAttraction);
 
     const adultPrice = serverSideAttraction.adultPrice;
@@ -191,11 +215,14 @@ function calulateTotal(numberOfKids, numberOfAdults, serverSideAttraction) {
 }
 
 function displayTotal(event) {
+    console.log("displaying a total price based on client side info");
     var order = event.target.parentNode;
     var total = order.querySelector(".total");
 
     var kids = order.querySelector(".numberofkids").value;
     var adults = order.querySelector(".numberofadults").value;
+    if (kids === "") kids = 0;
+    if (adults === "") adults = 0;
 
     let re = /\d+/;
     var kidsPrice = order.querySelector(".kidsprice")
@@ -229,6 +256,7 @@ function displayTotal(event) {
     if (Number.parseInt(kids) >= Number.parseInt(minNumberkids) && Number.parseInt(adults) >= Number.parseInt(minNumberadults)) {
         discount = value * Number.parseFloat(discountPercentage) / 100
         value = value - discount;
+        console.log("---> applying the discount of " + discountPercentage + "%, resulting in " + discount + " discount")
     }
     // console.log(value);
 
@@ -241,6 +269,7 @@ function displayTotal(event) {
 
 
 function setStickyNavBar() {
+    console.log("making the navbar sticky");
     // Get the header
     var header = document.getElementById("sticky-header");
 

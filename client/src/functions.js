@@ -1,4 +1,4 @@
-// Dynamic article displaying
+// client/src/function.js
 export async function fetchAttractions() {
 
     try {
@@ -10,8 +10,9 @@ export async function fetchAttractions() {
             throw new Error(message);
         }
 
-        const attractions = response.json();
+        const attractions = await response.json();
         return attractions;
+
 
     } catch(error) {
         console.log("something went wrong when fetching attractions: ", error);

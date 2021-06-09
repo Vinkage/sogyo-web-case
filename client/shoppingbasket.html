@@ -69,7 +69,7 @@
         async function requestPlaceOrder() {
             var main = document.querySelector("main");
             var orders = localStorage.getItem("shoppingBasketArray");
-            console.log(orders);
+            // console.log(orders);
 
             const response = await fetch("api/placeorder",
                 {

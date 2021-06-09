@@ -34,7 +34,7 @@ export class Order extends TemplatedNode {
         clone.querySelector(".numberofadults").textContent = "Adults: " + this.numberOfAdults;
 
 
-        var priceString = "Total: " + dutchCurrencyFormat(this.price.total);
+        var priceString = "Total: " + dutchCurrencyFormatWithSign(this.price.total);
         if (this.price.discount) {
             priceString = priceString + " discount: " + dutchCurrencyFormatWithSign(this.price.discount);
         }

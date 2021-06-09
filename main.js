@@ -5,6 +5,14 @@
  */
 const express = require('express');
 const app = express();
+const dbUtils = require('./mongodbFunctions.js');
+
+/**
+ * Import the dummy attractions in the database
+ *
+ */
+dbUtils.clearMainDataBaseAndInsertDummyForTestingTheSite();
+
 /**
  * Host all files in the client folder as static resources.
  * That means: localhost:8080/someFileName.js corresponds to client/someFileName.js.
@@ -15,97 +23,6 @@ app.use(express.static('client'));
  * Allow express to understand json serialization.
  */
 app.use(express.json());
-
-/**
- * Our code starts here.
- */
-const attractions = [
-    {
-        name: "De Efteling",
-        description: "The Dutch fairy tale themed park. In high demand!",
-        adultPrice: 32,
-        kidsPrice: 32,
-        minimumNumberOfAdults: 2,
-        minimumNumberOfKids: 1,
-        discount: 15,
-        available: 1,
-        location: { lat: 51.649718, lon: 5.043689 },
-    },
-
-    {
-        name: "Madurodam",
-        description: "The Netherlands smallest theme park.",
-        adultPrice: 25,
-        kidsPrice: 20,
-        minimumNumberOfAdults: 1,
-        minimumNumberOfKids: 2,
-        discount: 25,
-        available: 5,
-        location: { lat: 52.0994779, lon: 4.299619900000039 },
-    },
-
-    {
-        name: "Toverland",
-        description: "Experience magic and wonder.",
-        adultPrice: 30,
-        kidsPrice: 30,
-        minimumNumberOfAdults: 2,
-        minimumNumberOfKids: 2,
-        discount: 33,
-        available: 3,
-        location: { lat: 51.3968994, lon: 5.9825161 },
-    },
-
-    {
-        name: "Walibi Holland",
-        description: "Need an Adrenaline Rush?",
-        adultPrice: 37,
-        kidsPrice: 37,
-        minimumNumberOfAdults: 4,
-        minimumNumberOfKids: 0,
-        discount: 10,
-        available: 20,
-        location: { lat: 52.438554, lon: 5.766986 },
-    },
-
-    {
-        name: "Duinrell",
-        description: "From the Kikkerbaan to the Tikibad.",
-        adultPrice: 22,
-        kidsPrice: 19,
-        minimumNumberOfAdults: 1,
-        minimumNumberOfKids: 3,
-        discount: 7,
-        available: 20,
-        location: { lat: 52.147433, lon: 4.383922 },
-    },
-
-    {
-        name: "Slagharen",
-        description: "Fun for the whole family in a true western style.",
-        adultPrice: 28,
-        kidsPrice: 20,
-        minimumNumberOfAdults: 2,
-        minimumNumberOfKids: 2,
-        discount: 50,
-        available: 2,
-        location: { lat: 52.6249522, lon: 6.563149500000009 },
-    },
-
-    {
-        name: "Drievliet",
-        description: "Come and experience our wonderful attractions.",
-        adultPrice: 26,
-        kidsPrice: 24,
-        minimumNumberOfAdults: 1,
-        minimumNumberOfKids: 2,
-        discount: 25,
-        available: 0,
-        location: { lat: 52.052608, lon: 4.352633 },
-    },
-]
-
-var ordersOnServer = [];
 
 /**
  * A route is like a method call. It has a name, some parameters and some return value.
@@ -120,36 +37,51 @@ var ordersOnServer = [];
  * the Express framework will call one of the methods defined here.
  * These are just regular functions. You can edit, expand or rewrite the code here as needed.
  */
-app.get("/api/attractions", function (request, response) {
+
+// main.js
+app.get("/api/attractions", async function (request, response) {
     console.log("Api call received for /attractions");
 
-    response.json(attractions)
+    const attractions = await dbUtils.connectToDatabaseAndDo(
+        (db) => {return db.collection("attractions").find().toArray()}
+    );
+    response.json(attractions);
 });
 
-app.post("/api/placeorder", function (request, response) {
+app.post("/api/placeorder", async function (request, response) {
     console.log("Api call received for /placeorder");
-    // console.log("hello");
 
     var orders = request.body;
 
     for (let i = 0; i < orders.length; i++) {
-        for (let j = 0; j < attractions.length; j++) {
-            if (orders[i].name === attractions[j].name) {
-                attractions[j].available = attractions[j].available - orders[i].numberOfAdults - orders[i].numberOfKids;
+        orders[i] = dbUtils.giveUnique_idField(orders[i]);
+
+        const order = orders[i];
+        await dbUtils.connectToDatabaseAndDo(
+            db => {
+                const attractions = db.collection("attractions");
+                const attraction = attractions.findOne({name: order.name});
+                const currentOrders = attraction.orders;
+                if (!currentOrders) {
+                    attractions.updateOne(
+                        {name: order.name},
+                        {
+                            $set: {orders: [order._id]}
+                        }
+                    )
+                } else {
+                    attractions.updateOne(
+                        {name: order.name},
+                        {
+                            $set: {orders: currentOrders.push(order._id)}
+                        }
+                    )
+                }
             }
-        }
+        );
     }
 
-    ordersOnServer = ordersOnServer.concat(orders);
-
-
-    console.log("orders serverside: ");
-    console.log(ordersOnServer);
-
-    /**
-     * Send the status code 200 back to the clients browser.
-     * This means OK.
-     */
+    await dbUtils.connectToDatabaseAndDo(db => {return db.collection("orders").insertMany(orders)});
     response.sendStatus(200);
 });
 
@@ -164,6 +96,7 @@ app.get("/api/admin/edit", function (request, response) {
 
     response.sendStatus(200);
 });
+
 
 
 /**
