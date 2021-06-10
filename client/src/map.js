@@ -1,4 +1,4 @@
-import { fetchAttractions } from "./functions.js"
+import { fetchAttractions } from "./utils.js"
 import { ParkArticle } from "./templateImplementations.js"
 
 // replace "toner" here with "terrain" or "watercolor"
@@ -10,6 +10,8 @@ var map = new L.Map("discoverablemap", {
 map.addLayer(layer);
 
 function addMarkersForAttractions(map) {
+    const template = document.querySelector("#parkpopup");
+
     return function addMarkers(attractions) {
         for (let i = 0; i < attractions.length; i++) {
             const attraction = attractions[i];
@@ -17,20 +19,14 @@ function addMarkersForAttractions(map) {
 
             const marker = L.marker([location.lat, location.lon]).addTo(map);
 
-            const articleObj = new ParkArticle(attraction, document.querySelector("parkpopup"))
-            console.log(articleObj)
-            const parkArticleFunctionality = {
-                orderButtonClick: orderButtonClicked,
-                displayTotal: displayTotal,
-                disableButton: disableButton,
-            }
-            const articleHTML = articleObj.toHTML(parkArticleFunctionality);
-            console.log(articleHTML);
+            const articleObj = new ParkArticle(attraction, template);
+            const articleHTML = articleObj.toHTML();
 
+            var div = L.DomUtil.create('div', 'popupcontent');
+            const popupcontent = articleHTML;
+            div.appendChild(popupcontent);
 
-            marker.bindPopup(
-                articleHTML
-            )
+            marker.bindPopup(div)
 
         }
     }

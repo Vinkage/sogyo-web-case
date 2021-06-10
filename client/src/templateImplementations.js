@@ -1,5 +1,24 @@
-import { dutchCurrencyFormat, dutchCurrencyFormatWithSign } from "./utils.js"
-import { fetchAttractions } from "./functions.js"
+import {
+    dutchCurrencyFormat,
+    dutchCurrencyFormatWithSign,
+} from "./utils.js"
+
+import {
+    disableButton,
+    calulateTotal,
+    checkTicketAvailability,
+    displayTotal
+} from "./attractionArticle.js"
+
+import {
+    cancelOrder
+} from "./orderArticle.js"
+
+import {
+    updateAttractionInDatabase,
+    deleteAttractionInDatabase
+} from "./adminArticle.js"
+
 /**
  * Abstract class
  *
@@ -21,10 +40,38 @@ class TemplatedNode {
     }
 }
 
+export class AdminAttraction extends TemplatedNode {
+    addToNode(node) {
+        var clone = this.template.content.cloneNode(true);
+        clone.querySelector(".parkname").textContent = this.name;
+
+        clone.querySelector(".adultprice").querySelector(".adultPrice").value = this.adultPrice;
+        clone.querySelector(".kidsprice").querySelector(".kidsPrice").value = this.kidsPrice;
+
+        clone.querySelector(".discountrequirement").querySelector(".minimumNumberOfAdults").value = this.minimumNumberOfAdults;
+        clone.querySelector(".discountrequirement").querySelector(".minimumNumberOfKids").value = this.minimumNumberOfKids;
+        clone.querySelector(".discountrequirement").querySelector(".discount").value = this.discount;
+
+        clone.querySelector(".availabletickets").querySelector(".available").value = this.available;
+
+        const inputElements = clone.querySelectorAll("input");
+        for (let i = 0; i < inputElements.length; i++) {
+            const input = inputElements[i];
+            const fieldToUpdate = input.className;
+            input.addEventListener("input", updateAttractionInDatabase(this.name, fieldToUpdate));
+        }
+
+        const deletebutton = clone.querySelector("#deletebutton");
+        deletebutton.addEventListener("click", deleteAttractionInDatabase(this.name));
+
+        node.appendChild(clone);
+    }
+}
+
 
 export class Order extends TemplatedNode {
 
-    addToNode(node, orderFunctionality) {
+    addToNode(node) {
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
 
         var clone = this.template.content.cloneNode(true);
@@ -40,7 +87,9 @@ export class Order extends TemplatedNode {
         }
         clone.querySelector(".price").textContent = priceString;
 
-        clone.querySelector("button").addEventListener("click", orderFunctionality.cancel);
+        var button = clone.querySelector("button");
+
+        if (button) button.addEventListener("click", cancelOrder);
 
         node.appendChild(clone);
     }
@@ -49,17 +98,17 @@ export class Order extends TemplatedNode {
 
 export class ParkArticle extends TemplatedNode {
 
-    addToNode(node, parkArticleFunctionality) {
-        const clone = this.cloneTemplateAndFillInHTML(parkArticleFunctionality);
+    addToNode(node) {
+        const clone = this.cloneTemplateAndFillInHTML();
         node.appendChild(clone);
     }
 
-    toHTML(parkArticleFunctionality) {
-        return this.cloneTemplateAndFillInHTML(parkArticleFunctionality);
+    toHTML() {
+        return this.cloneTemplateAndFillInHTML();
 
     }
 
-    cloneTemplateAndFillInHTML(parkArticleFunctionality) {
+    cloneTemplateAndFillInHTML() {
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
 
         var clone = this.template.content.cloneNode(true);
@@ -94,12 +143,12 @@ export class ParkArticle extends TemplatedNode {
         }
 
         var button = clone.querySelector(".orderbutton");
-        parkArticleFunctionality.disableButton(this.name, button)(null);
+        disableButton(this.name, button)(null);
 
         var inputElements = clone.querySelectorAll("input");
         for (let i = 0; i < inputElements.length; i++) {
-            inputElements[i].addEventListener("input", parkArticleFunctionality.displayTotal);
-            inputElements[i].addEventListener("input", parkArticleFunctionality.disableButton(this.name, button));
+            inputElements[i].addEventListener("input", displayTotal);
+            inputElements[i].addEventListener("input", disableButton(this.name, button));
         }
         return clone;
     }

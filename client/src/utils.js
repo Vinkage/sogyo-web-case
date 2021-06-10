@@ -1,3 +1,52 @@
+// client/src/function.js
+export async function fetchOrders() {
+
+    try {
+
+        const response = await fetch("api/myorders");
+
+        if (!response.ok) {
+            const message = `An error has occured: ${response.status}`;
+            throw new Error(message);
+        }
+
+        const orders = await response.json();
+        return orders;
+
+
+    } catch(error) {
+        console.log("something went wrong when fetching orders: ", error);
+    }
+
+}
+
+export async function fetchAttractions() {
+
+    try {
+
+        const response = await fetch("api/attractions");
+
+        if (!response.ok) {
+            const message = `An error has occured: ${response.status}`;
+            throw new Error(message);
+        }
+
+        const attractions = await response.json();
+        return attractions;
+
+
+    } catch(error) {
+        console.log("something went wrong when fetching attractions: ", error);
+    }
+
+}
+
+export function readOrderArrayFromLocalStorage() {
+    var orders = JSON.parse(localStorage.getItem("shoppingBasketArray"));
+    return orders;
+}
+
+
 export function displayNumberOfItemsInShoppingBasketWithBadge() {
     var shoppingBasketArray = JSON.parse(localStorage.getItem("shoppingBasketArray"));
     if (shoppingBasketArray === null) {
@@ -20,14 +69,6 @@ export function dutchCurrencyFormatWithSign(number) {
 }
 
 
-export function findParentWithTag(tagName) {
-    if (this.tagName === tagName.toUpperCase()) {
-        return this;
-    } else {
-        return findParentWithTag.bind(this.parentNode)(tagName);
-    }
-}
-
 export function findParent(func) {
     return function startingFromThisNode(node) {
         if (func(node)) {
@@ -38,22 +79,12 @@ export function findParent(func) {
     }
 }
 
+export function kill(node) {
+    node.parentNode.removeChild(node);
+}
 
-export function childKillerUsingTags(parent) {
-
-    return function oneOfMyChildren(child) {
-
-        return function killChildrenWithTag(tag) {
-            if (child === null) {
-                return
-            } else if (child.tagName === tag.toUpperCase()) {
-                var next = child.nextSibling;
-                parent.removeChild(child);
-                return oneOfMyChildren(next)(tag);
-            } else {
-                return oneOfMyChildren(child.nextSibling)(tag);
-            }
-        }
-
+export function killChildren(func) {
+    return function startingFromThisChildNode(node) {
     }
 }
+

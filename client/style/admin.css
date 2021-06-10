@@ -1,0 +1,29 @@
+.info {
+    margin: 15px;
+}
+
+input {
+    width: 50px;
+}
+
+.newattraction {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: left;
+    align-items: center;
+    margin: 15px 2.3% 15px 2.3%;
+    border: 1px solid var(--primary-color);
+}
+
+.newattractioninput {
+    margin: 5px;
+    width: auto;
+}
+
+.newattractioninput input {
+    min-width: 140px;
+    resize: both;
+    height: 30px;
+}
+

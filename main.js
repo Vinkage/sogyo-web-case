@@ -88,18 +88,90 @@ app.post("/api/placeorder", async function (request, response) {
     response.sendStatus(200);
 });
 
-app.get("/api/myorders", function (request, response) {
+app.get("/api/myorders", async function (request, response) {
     console.log("Api call received for /myorders");
+    const orders = await dbUtils.connectToDatabaseAndDo(
+        db => {return db.collection("orders").find().toArray()}
+    );
 
-    response.sendStatus(200);
+    response.json(orders);
 });
 
-app.get("/api/admin/edit", function (request, response) {
+app.post("/api/admin/edit", function (request, response) {
     console.log("Api call received for /admin/edit");
 
+    const name = request.body.name;
+    const field = request.body.field;
+    const value = request.body.value;
+
+    const updateObject = {};
+    updateObject[field] = value
+
+    dbUtils.connectToDatabaseAndDo(
+        db => {
+            const attractions = db.collection("attractions");
+            attractions.updateOne(
+                {name: name},
+                {
+                    $set: updateObject
+                }
+            )
+
+        }
+    )
+
     response.sendStatus(200);
 });
 
+app.post("/api/admin/delete", function (request, response) {
+    console.log("Api call received for /admin/delete");
+
+    const name = request.body.name;
+
+    dbUtils.connectToDatabaseAndDo(
+        db => {
+            const attractions = db.collection("attractions");
+            attractions.deleteOne({name: name});
+        }
+    );
+
+    response.sendStatus(200);
+});
+
+app.post("/api/admin/add", function (request, response) {
+    console.log("Api call received for /admin/add");
+
+    const name = request.body.name;
+    const description = request.body.description;
+    const lat = request.body.lat;
+    const lon = request.body.long;
+
+    const attraction = {
+        name: name,
+        description: description,
+        adultPrice: 0,
+        kidsPrice: 0,
+        minimumNumberOfAdults: 0,
+        minimumNumberOfKids: 0,
+        discount: 0,
+        available: 0,
+        location: {
+            lat: lat,
+            lon: lon,
+        }
+    }
+
+    dbUtils.connectToDatabaseAndDo(
+        db => {
+            const attractions = db.collection("attractions");
+            attractions.insertOne(attraction);
+        }
+    );
+
+
+
+    response.json(attraction);
+});
 
 
 /**

@@ -8,6 +8,7 @@
         <meta name="description" content="The ticket shop for Sogyo employees">
 
         <link rel="stylesheet" href="style/main.css">
+        <link rel="stylesheet" href="style/admin.css">
     </head>
 
     <body>
@@ -41,9 +42,44 @@
         </nav>
 
         <main>
-
-            
-
+            <div class="newattraction" style="">
+                <button class="orderbutton" id="addbutton">
+                    <span class="front">
+                        Add
+                    </span>
+                </button>
+                <div class="newattractioninput"><label>New name:</label><input id="newattractionname" placeholder="new attraction name"/></div>
+                <div class="newattractioninput"><label>Description:</label><input id="newattractiondescription" placeholder="description"/></div>
+                <div class="newattractioninput"><label>Lat:</label><input .class="newattractioninput" id="newlat" placeholder="lat gps position"/></div>
+                <div class="newattractioninput"><label>Long:</label><input .class="newattractioninput" id="newlong" placeholder="long gps position"/></div>
+            </div>
         </main>
+
+        <template id="adminattraction">
+            <article>
+                <div class="parkname"></div>
+                <div class="info">
+                    <div class="prices">
+                        <div class="adultprice">Adult price: <span class="sign">&euro;</span><input type="number" class="adultPrice"/></div>
+                        <div class="kidsprice">Kids price: <span class="sign">&euro;</span><input type="number" class="kidsPrice"/></div>
+                        <div class="discountrequirement">
+                            <em>Discount requirement:</em>
+                            Buy <input type="number" class="minimumNumberOfAdults"/> adult tickets & <input type="number" class="minimumNumberOfKids"/> kid tickets for a <input type="number" class="discount"/>% discount!
+                        </div>
+                    </div>
+                    <div class="availabletickets">Available tickets: <input type="number" class="available"/></div>
+                </div>
+                <button class="orderbutton" id="deletebutton">
+                    <span class="front">
+                        Delete
+                    </span>
+                </button>
+            </article>
+        </template>
+
+
+        <script type="module" src="src/admin.js"></script>
+
+
     </body>
 </html>
