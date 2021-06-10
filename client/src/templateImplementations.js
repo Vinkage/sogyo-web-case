@@ -50,6 +50,16 @@ export class Order extends TemplatedNode {
 export class ParkArticle extends TemplatedNode {
 
     addToNode(node, parkArticleFunctionality) {
+        const clone = this.cloneTemplateAndFillInHTML(parkArticleFunctionality);
+        node.appendChild(clone);
+    }
+
+    toHTML(parkArticleFunctionality) {
+        return this.cloneTemplateAndFillInHTML(parkArticleFunctionality);
+
+    }
+
+    cloneTemplateAndFillInHTML(parkArticleFunctionality) {
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
 
         var clone = this.template.content.cloneNode(true);
@@ -91,6 +101,6 @@ export class ParkArticle extends TemplatedNode {
             inputElements[i].addEventListener("input", parkArticleFunctionality.displayTotal);
             inputElements[i].addEventListener("input", parkArticleFunctionality.disableButton(this.name, button));
         }
-        node.appendChild(clone);
+        return clone;
     }
 }

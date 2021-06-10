@@ -1,5 +1,10 @@
 import { ParkArticle } from "./templateImplementations.js";
-import { displayNumberOfItemsInShoppingBasketWithBadge, dutchCurrencyFormat, dutchCurrencyFormatWithSign } from "./utils.js";
+import {
+    displayNumberOfItemsInShoppingBasketWithBadge,
+    dutchCurrencyFormat,
+    dutchCurrencyFormatWithSign,
+    findParent
+} from "./utils.js";
 import { fetchAttractions } from "./functions.js"
 
 
@@ -216,7 +221,8 @@ function calulateTotal(numberOfKids, numberOfAdults, serverSideAttraction) {
 
 function displayTotal(event) {
     console.log("displaying a total price based on client side info");
-    var order = event.target.parentNode;
+    var order = findParent(parent => {return parent.classList.contains("order")})(event.target)
+    console.log(order)
     var total = order.querySelector(".total");
 
     var kids = order.querySelector(".numberofkids").value;

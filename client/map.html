@@ -9,6 +9,10 @@
 
         <link rel="stylesheet" href="style/main.css">
         <link rel="stylesheet" href="style/map.css">
+
+         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
     </head>
 
     <body>
@@ -51,6 +55,41 @@
 
         </main>
 
-        <script src="src/index.js"></script>
+        <template id="parkpopup">
+            <article>
+                <div class="parkname"></div>
+                <div class="parkdescription"></div>
+                <div class="order">
+                    <div class="prices">
+                        <div class="adultprice">Adults: <span class="sign">&euro;</span><span class="price">32,-</span></div>
+                        <div class="kidsprice">Kids: <span class="sign">&euro;</span><span class="price">32,-</span></div>
+                        <div class="discountrequirement">
+                            <em>Family ticket:</em>
+                            Buy <span class="adults">2</span> adult tickets & <span class="child">2</span> kid tickets for a <span class="percentage">15</span>% discount!
+                        </div>
+                    </div>
+                    <div class="adultinput">
+                        <label>Adults: </label><input placeholder="adults" type="number" class="numberofadults" />
+                    </div>
+                    <div class="kidsinput">
+                        <label>Kids: </label><input placeholder="kids" type="number" class="numberofkids" />
+                    </div>
+                    <div class="total"><span class="sign">&euro;</span><span class="price">0,-</span></div>
+                    <button class="orderbutton">
+                        <span class="front">
+                        Add to shopping basket
+                        </span>
+                    </button>
+                </div>
+            </article>
+        </template>
+
+
+
+         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+        <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+        <script type = "module" src="src/map.js"></script>
     </body>
 </html>

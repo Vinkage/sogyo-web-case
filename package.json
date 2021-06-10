@@ -3,8 +3,17 @@
   "version": "1.0.0",
   "description": "Het project voor de Ticketshop opdracht",
   "main": "main.js",
+  "scripts": {
+    "dev": "nodemon main.js"
+  },
   "dependencies": {
+    "ejs": "^3.1.6",
     "express": "^4.16.4",
+    "leaflet": "^1.7.1",
     "mongodb": "^3.6.9"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.7"
   }
 }

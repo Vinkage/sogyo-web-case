@@ -28,6 +28,17 @@ export function findParentWithTag(tagName) {
     }
 }
 
+export function findParent(func) {
+    return function startingFromThisNode(node) {
+        if (func(node)) {
+            return node;
+        } else {
+            return startingFromThisNode(node.parentNode);
+        }
+    }
+}
+
+
 export function childKillerUsingTags(parent) {
 
     return function oneOfMyChildren(child) {

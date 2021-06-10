@@ -58,22 +58,25 @@ app.post("/api/placeorder", async function (request, response) {
 
         const order = orders[i];
         await dbUtils.connectToDatabaseAndDo(
-            db => {
+            async (db) => {
                 const attractions = db.collection("attractions");
-                const attraction = attractions.findOne({name: order.name});
+                const attraction = await attractions.findOne({name: order.name});
                 const currentOrders = attraction.orders;
+
+                console.log("available after order: " + (attraction.available - order.numberOfKids - order.numberOfAdults))
+
                 if (!currentOrders) {
                     attractions.updateOne(
                         {name: order.name},
                         {
-                            $set: {orders: [order._id]}
+                            $set: {orders: [order._id], available: (attraction.available - order.numberOfKids - order.numberOfAdults)}
                         }
                     )
                 } else {
                     attractions.updateOne(
                         {name: order.name},
                         {
-                            $set: {orders: currentOrders.push(order._id)}
+                            $set: {orders: currentOrders.push(order._id), available: (attraction.available - order.numberOfKids - order.numberOfAdults)}
                         }
                     )
                 }

@@ -1,3 +1,7 @@
 article {
     height: auto;
 }
+
+#finalizepaymentbutton {
+    display: block;
+}
