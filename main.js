@@ -54,38 +54,64 @@ app.post("/api/placeorder", async function (request, response) {
     var orders = request.body;
 
     for (let i = 0; i < orders.length; i++) {
-        orders[i] = dbUtils.giveUnique_idField(orders[i]);
-
         const order = orders[i];
         await dbUtils.connectToDatabaseAndDo(
             async (db) => {
                 const attractions = db.collection("attractions");
                 const attraction = await attractions.findOne({name: order.name});
-                const currentOrders = attraction.orders;
 
-                console.log("available after order: " + (attraction.available - order.numberOfKids - order.numberOfAdults))
-
-                if (!currentOrders) {
-                    attractions.updateOne(
-                        {name: order.name},
-                        {
-                            $set: {orders: [order._id], available: (attraction.available - order.numberOfKids - order.numberOfAdults)}
-                        }
-                    )
-                } else {
-                    attractions.updateOne(
-                        {name: order.name},
-                        {
-                            $set: {orders: currentOrders.push(order._id), available: (attraction.available - order.numberOfKids - order.numberOfAdults)}
-                        }
-                    )
+                // const availableAfterOrder = -1;
+                const availableAfterOrder = (attraction.available - order.numberOfKids - order.numberOfAdults);
+                if (availableAfterOrder < 0) {
+                    response.sendStatus(403);
+                    return;
                 }
+
             }
         );
     }
 
-    await dbUtils.connectToDatabaseAndDo(db => {return db.collection("orders").insertMany(orders)});
-    response.sendStatus(200);
+    if (response.statusCode === 200) {
+        console.log("---> valid order status so far is " + response.statusCode + ", adding to database");
+        for (let i = 0; i < orders.length; i++) {
+            orders[i] = dbUtils.giveUnique_idField(orders[i]);
+
+            const order = orders[i];
+            await dbUtils.connectToDatabaseAndDo(
+                async (db) => {
+                    const attractions = db.collection("attractions");
+                    const attraction = await attractions.findOne({name: order.name});
+                    const currentOrders = attraction.orders;
+
+                    const availableAfterOrder = (attraction.available - order.numberOfKids - order.numberOfAdults);
+                    console.log("available after order: " + availableAfterOrder)
+
+                    if (!currentOrders) {
+                        attractions.updateOne(
+                            {name: order.name},
+                            {
+                                $set: {orders: [order._id], available: availableAfterOrder}
+                            }
+                        )
+                    } else {
+                        attractions.updateOne(
+                            {name: order.name},
+                            {
+                                $set: {orders: currentOrders.push(order._id), available: availableAfterOrder}
+                            }
+                        )
+                    }
+                }
+            );
+        }
+
+
+        await dbUtils.connectToDatabaseAndDo(db => {return db.collection("orders").insertMany(orders)});
+        response.sendStatus(200);
+    } else {
+        console.log("---> invalid order status so far is " + response.statusCode)
+    }
+
 });
 
 app.get("/api/myorders", async function (request, response) {
@@ -107,18 +133,23 @@ app.post("/api/admin/edit", function (request, response) {
     const updateObject = {};
     updateObject[field] = value
 
-    dbUtils.connectToDatabaseAndDo(
-        db => {
-            const attractions = db.collection("attractions");
-            attractions.updateOne(
-                {name: name},
-                {
-                    $set: updateObject
-                }
-            )
+    if (value >= 0) {
+        dbUtils.connectToDatabaseAndDo(
+            db => {
+                const attractions = db.collection("attractions");
+                attractions.updateOne(
+                    {name: name},
+                    {
+                        $set: updateObject
+                    }
+                )
 
-        }
-    )
+            }
+        )
+    } else {
+        response.sendStatus(403);
+        return;
+    }
 
     response.sendStatus(200);
 });

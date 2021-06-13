@@ -84,7 +84,75 @@ export function kill(node) {
 }
 
 export function killChildren(func) {
-    return function startingFromThisChildNode(node) {
+    return function givenTheParent(parent) {
+        console.log("removing children of ")
+        console.log(parent)
+        function removeParentsChildren(child) {
+            if (child === null) return;
+            else if (func(child)) {
+                const next = child.nextSibling;
+                parent.removeChild(child);
+                return removeParentsChildren(next);
+            } else {
+                return removeParentsChildren(child.nextSibling);
+            }
+        }
+        removeParentsChildren(parent.firstChild)
     }
 }
 
+export function getUserGeoLocation() {
+    if (navigator.geolocation) console.log("browser supports geolocation")
+
+    const getCoords = async () => {
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+
+        return {
+          long: pos.coords.longitude,
+          lat: pos.coords.latitude,
+        };
+    };
+
+    return getCoords();
+}
+
+export function distanceToUser(userLocation) {
+    return function calculateDistanceBasedOnLatLon(lat, lon) {
+        const R = 6371e3; // metres
+        const phi1 = userLocation.lat * Math.PI/180; // φ, λ in radians
+        const phi2 = lat * Math.PI/180;
+        const diffPhi = (lat-userLocation.lat) * Math.PI/180;
+        const diffLambda = (lon-userLocation.long) * Math.PI/180;
+
+        const a = Math.sin(diffPhi/2) * Math.sin(diffPhi/2) +
+                  Math.cos(phi1) * Math.cos(phi2) *
+                  Math.sin(diffLambda/2) * Math.sin(diffLambda/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        const d = R * c; // in metres
+        return d;
+    }
+}
+
+export function bubbleSort(array, key, compare) {
+    const sorted = [...array];
+    console.log("original: " + array);
+    console.log("copy: " + sorted);
+
+    var tmp;
+    for (let i = 0; i < array.length; i++) {
+        for (let j = 1; j < array.length - i; j++) {
+
+            if (compare(key(sorted[j - 1]), key(sorted[j]))) {
+                tmp = sorted[j];
+                sorted[j] = sorted[j-1];
+                sorted[j - 1] = tmp;
+            }
+
+
+        }
+    }
+    return sorted;
+}
