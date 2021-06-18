@@ -1,4 +1,7 @@
-import { fetchAttractions } from "./utils.js"
+import {
+    fetchAttractions,
+    displayNumberOfItemsInShoppingBasketWithBadge,
+} from "./utils.js"
 import { ParkArticle } from "./templateImplementations.js"
 
 // replace "toner" here with "terrain" or "watercolor"
@@ -33,5 +36,6 @@ function addMarkersForAttractions(map) {
 }
 
 
+displayNumberOfItemsInShoppingBasketWithBadge();
  fetchAttractions()
         .then(addMarkersForAttractions(map));
